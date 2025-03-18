@@ -2,7 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-from flask import Flask, redirect, url_for, jsonify, request
+from flask import Flask, redirect, url_for, jsonify, request, render_template, Response
 
 from dotenv import load_dotenv
 import os
@@ -48,7 +48,7 @@ with app.app_context():
 
 def create_payment(usuario, plano, Assinatura: Assinatura):
     payment_json = {
-        'back_url': 'https://url_do_meu_site.com/mercadopago/success',  # Url de redirect
+        'back_url': 'https://mercadopago-subscriptions-boilerplate.onrender.com/mercadopago/sucesso',  # Url de redirect
         'reason': f"Plano {plano.nome}",
         "auto_recurring": {  # Cobrança automática
             'frequency': {plano.frequencia},
@@ -70,12 +70,37 @@ def create_payment(usuario, plano, Assinatura: Assinatura):
     else:
         return redirect(url_for('index'))
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    planos = Plano.query.all()  # Busca todos os planos disponíveis
+    
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        plano_id = request.form['plano_id']
+
+        novo_usuario = Usuario(nome=nome, email=email)
+        db.session.add(novo_usuario)
+        db.session.commit()
+
+        plano = Plano.query.get(plano_id)  # Obtém o plano escolhido pelo usuário
+        
+        if plano:
+            create_payment(novo_usuario, plano)
+        else:
+            redirect(url_for('index'))
+
+    return render_template('index.html', planos=planos)
 
 @app.route('/mercadopago/notificacao', methods=['POST', 'GET'])
-def notification():
+def notificacao():
     dados = request.data
     print('Dados:', dados)
     return jsonify({"status": "Recebido com sucesso"}), 200
+
+@app.route('/mercadopago/sucesso')
+def sucesso():
+    return Response("Deu tudo certo")
 
 
 if __name__ == '__main__':
