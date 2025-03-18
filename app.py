@@ -66,9 +66,10 @@ def cria_link_pagamento(usuario: Usuario, plano: Plano):
     }
 
     headers = {"Authorization": f"Bearer {os.getenv('MERCADO_PAGO_ACCESS_TOKEN')}", "Content-Type": "application/json"}
+    print(headers)
     response = requests.post("https://api.mercadopago.com/preapproval_plan", json=json_pagamento, headers=headers)
 
-    print(response)
+    print(response.json())
 
     if response.status_code == 201:
         preapproval_id = response.json()["id"]  # Id do pedido do usuário
@@ -89,11 +90,11 @@ def cria_link_pagamento(usuario: Usuario, plano: Plano):
 def index():
     planos = Plano.query.all()  # Busca todos os planos disponíveis
     
+    # Registrando o usuário
     if request.method == 'POST':
         nome = request.form['nome']
         email = request.form['email']
         plano_id = request.form['plano_id']
-        print(plano_id)
 
         novo_usuario = Usuario(nome=nome, email=email)
         db.session.add(novo_usuario)
