@@ -59,17 +59,14 @@ def cria_link_pagamento(usuario: Usuario, plano: Plano):
         "reason": f"Plano {plano.nome}", 
         "auto_recurring": {  
             'frequency': plano.frequencia,
-            'frequency_types': "months",
+            'frequency_type': "months",
             "transaction_amount": float(plano.preco),
             "currency_id": "BRL"
         },
     }
 
     headers = {"Authorization": f"Bearer {os.getenv('MERCADO_PAGO_ACCESS_TOKEN')}", "Content-Type": "application/json"}
-    print(headers)
     response = requests.post("https://api.mercadopago.com/preapproval_plan", json=json_pagamento, headers=headers)
-
-    print(response.json())
 
     if response.status_code == 201:
         preapproval_id = response.json()["id"]  # Id do pedido do usuário
