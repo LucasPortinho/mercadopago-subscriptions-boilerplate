@@ -66,6 +66,11 @@ def create_payment(usuario, plano, Assinatura: Assinatura):
         init_point = response.json()["init_point"]
         assinatura = Assinatura(usuario=usuario, plano=plano, preapproval_id=preapproval_id)
         
+        db.session.add(assinatura)
+        db.session.commit()
+
+        print(init_point)
+
         return redirect(init_point)
     else:
         return redirect(url_for('index'))
@@ -97,6 +102,7 @@ def notificacao():
     dados = request.data
     print('Dados:', dados)
     return jsonify({"status": "Recebido com sucesso"}), 200
+
 
 @app.route('/mercadopago/sucesso')
 def sucesso():
