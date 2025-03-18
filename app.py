@@ -46,7 +46,7 @@ with app.app_context():
     db.create_all()
 
 
-def create_payment(usuario, plano, Assinatura: Assinatura):
+def create_payment(usuario, plano):
     payment_json = {
         'back_url': 'https://mercadopago-subscriptions-boilerplate.onrender.com/mercadopago/sucesso',  # Url de redirect
         'reason': f"Plano {plano.nome}",
@@ -68,8 +68,6 @@ def create_payment(usuario, plano, Assinatura: Assinatura):
         
         db.session.add(assinatura)
         db.session.commit()
-
-        print(init_point)
 
         return redirect(init_point)
     else:
