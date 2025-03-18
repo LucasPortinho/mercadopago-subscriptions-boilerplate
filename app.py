@@ -12,7 +12,7 @@ import requests
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mercado_pago_boilerplate.db'  # Utilize o banco de dados de sua preferência
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URI") # Utilize o banco de dados de sua preferência
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
