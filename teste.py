@@ -76,3 +76,7 @@ def notification():
     dados = request.data
     print('Dados:', dados)
     return jsonify({"status": "Recebido com sucesso"}), 200
+
+
+if __name__ == '__main__':
+    app.run()
