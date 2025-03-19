@@ -2,6 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask import Flask, redirect, url_for, jsonify, request, render_template, Response
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 from dotenv import load_dotenv
 import os
 
@@ -110,6 +113,47 @@ def index():
 @app.route('/mercadopago/notificacao', methods=['POST', 'GET'])
 def notificacao():
     dados = request.data  # Dados do webhook
+    tipo_notificacao = dados.get("type")
+    acao = dados.get("action")
+    id_dados = dados.get("data", {}).get("id")
+
+    if not tipo_notificacao or not acao or not id_dados:
+        print("Notificação inválida: tipo=", tipo_notificacao, "ação=", acao, "id_dados=", id_dados)
+        return jsonify({"status": "Notificação inválida"}), 400
+
+    if tipo_notificacao == 'subscription_authorized_payment':
+        # Notificação de autorização de pagamento -> Trate aqui essas informações
+        print("Noti de pagamento autorizado: ")
+        print(dados)
+        print()
+
+        return jsonify({"status": "Pagamento autorizado com sucesso"}), 200
+
+    if tipo_notificacao == 'subscription_preapproval':
+        # Aqui altera a URL da API, pois agora nao iremos mais buscar o id do plano e sim da assinatura.
+        subscription_id = id_dados
+        headers = {"Authorization": f"Bearer {os.getenv('MERCADO_PAGO_ACCESS_TOKEN')}"}
+        response = requests.get(f"https://api.mercadopago.com/preapproval/{subscription_id}", headers=headers)
+
+        dados_response = response.json()
+
+        # Id do plano e status de pagamento
+        preapproval_plan_id = dados_response.get('preapproval_plan_id')
+        status_pagamento = dados_response.get("status")
+        
+        # Utilizar sua lógica após o pagamento da assinatura ser confirmada
+        # Exemplo:
+        if status_pagamento == 'authorized':
+            assinatura = Assinatura.query.filter_by(preapproval_id=preapproval_plan_id).first()
+            assinatura.subscription_id = subscription_id
+
+            assinatura.ativo = True
+            assinatura.data_inicio = datetime.now()
+            assinatura.data_fim = datetime.now() + relativedelta(months=assinatura.plano.frequencia)
+
+            db.session.commit()
+
+
     print('Dados:', dados)
     return jsonify({"status": "Recebido com sucesso"}), 200
 
