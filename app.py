@@ -1,5 +1,3 @@
-
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask import Flask, redirect, url_for, jsonify, request, render_template, Response
@@ -7,7 +5,6 @@ from flask import Flask, redirect, url_for, jsonify, request, render_template, R
 from dotenv import load_dotenv
 import os
 
-import json
 import requests
 
 load_dotenv()
@@ -42,6 +39,8 @@ class Assinatura(db.Model):
     ativo = db.Column(db.Boolean, default=False)
     usuario = relationship('Usuario', back_populates='assinaturas')
     plano = relationship('Plano', back_populates='assinaturas')
+    preapproval_id = db.Column(db.String)
+    subscription_id = db.Column(db.String)
 
 with app.app_context():
     db.create_all()
