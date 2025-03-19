@@ -10,6 +10,8 @@ import os
 
 import requests
 
+import json
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -112,7 +114,10 @@ def index():
 # Notificações enviadas no webhook
 @app.route('/mercadopago/notificacao', methods=['POST', 'GET'])
 def notificacao():
-    dados = request.data  # Dados do webhook
+    # Convertendo os bytes em dict pois request.data vem como bytes
+    json_str = request.data.decode('utf-8')
+    dados = json.loads(json_str) # Dados do webhook
+
     tipo_notificacao = dados.get("type")
     acao = dados.get("action")
     id_dados = dados.get("data", {}).get("id")
