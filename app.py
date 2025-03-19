@@ -76,7 +76,7 @@ def cria_link_pagamento(usuario: Usuario, plano: Plano):
         db.session.add(assinatura)
         db.session.commit()
 
-        return redirect(init_point)  # Redirecionamento para o link de pagamento
+        return init_point  # Redirecionamento para o link de pagamento
     else:
         return redirect(url_for('index'))
 
@@ -99,7 +99,8 @@ def index():
         plano = Plano.query.get(plano_id)  # Obtém o plano escolhido pelo usuário
         
         if plano:
-            cria_link_pagamento(novo_usuario, plano)
+            link_pagamento = cria_link_pagamento(novo_usuario, plano)
+            return redirect(link_pagamento)
         else:
             redirect(url_for('index'))
 
