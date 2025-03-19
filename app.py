@@ -37,10 +37,10 @@ class Assinatura(db.Model):
     data_inicio = db.Column(db.DateTime)
     data_fim = db.Column(db.DateTime)
     ativo = db.Column(db.Boolean, default=False)
-    usuario = relationship('Usuario', back_populates='assinaturas')
-    plano = relationship('Plano', back_populates='assinaturas')
     preapproval_id = db.Column(db.String)
     subscription_id = db.Column(db.String)
+    usuario = relationship('Usuario', back_populates='assinaturas')
+    plano = relationship('Plano', back_populates='assinaturas')
 
 with app.app_context():
     db.create_all()
