@@ -59,7 +59,7 @@ def cria_link_pagamento(usuario: Usuario, plano: Plano):
     init_point -> Link de pagamento
     """
     json_pagamento = {
-        "back_url": "https://mercadopago-subscriptions-boilerplate.onrender.com/mercadopago/sucesso",
+        "back_url": "https://url_do_seu_site/mercadopago/sucesso",
         "reason": f"Plano {plano.nome}", 
         "auto_recurring": {  
             'frequency': plano.frequencia,
